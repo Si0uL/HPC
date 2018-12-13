@@ -24,7 +24,7 @@ int main (int argc, char *argvs[]) {
 	double epsilon = 1./100000000;
 	double epsilon2 = epsilon * epsilon;
 	double norm2 = epsilon2 + 1.; // to be > epsilon2
-	int idx1, idx2, ridx, diag_idx, n_iter = 0;
+	int idx1, idx2, ridx, x_idx, diag_idx, n_iter = 0;
 	// Only for master
 	double *A, *b;
 	// Common
@@ -115,10 +115,10 @@ int main (int argc, char *argvs[]) {
 		for (ridx=0; ridx < n_proc; ridx++) {
 			if (rank == ridx) {
 				// Compute missing part of x_k+1 (using previous x_k+1 terms)
-				// idx1 in [0, block_length[ / idx2 in [0, diag_idx[
+				// idx1 in [0, block_length[ / idx2 in [rank * block_length, diag_idx[
 				for (idx1=0; idx1 < block_length; idx1++) {
 					diag_idx = rank * block_length + idx1;
-					for (idx2=0; idx2 < diag_idx; idx2++)
+					for (idx2=rank * block_length; idx2 < diag_idx; idx2++)
 						new_x[diag_idx] += loc_A[size*idx1 + idx2] * new_x[idx2];
 
 					new_x[diag_idx] = (loc_b[idx1] - new_x[diag_idx]) /
@@ -128,6 +128,16 @@ int main (int argc, char *argvs[]) {
 			// Send this to other to unlock them
 			MPI_Bcast(&new_x[ridx*block_length], block_length, MPI_DOUBLE, ridx,
 				MPI_COMM_WORLD);
+			// Use received part to compute part of f term
+			if (rank > ridx) {
+				// idx1 in [0, block_length[
+				// idx2 in [ridx * block_length, (ridx + 1) * block_length[
+				for (idx1=0; idx1 < block_length; idx1++) {
+					x_idx = rank * block_length + idx1;
+					for (idx2=ridx * block_length; idx2 < (ridx+1) * block_length; idx2++)
+						new_x[x_idx] += loc_A[size*idx1 + idx2] * new_x[idx2];
+				}
+			}
 		}
 
 		// Computes norm^2
