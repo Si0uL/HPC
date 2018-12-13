@@ -1,0 +1,5 @@
+*.o
+*.out
+__pycache__/
+*.pyc
+*.pdf
