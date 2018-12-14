@@ -11,18 +11,20 @@
 
 int main (int argc, char *argvs[]) {
 
-	if (argc != 3) {
-		printf("Usage: %s [size] [verbose: 0/1]\n", argvs[0]);
+	if (argc != 4) {
+		printf("Usage: %s [size] [epsilon] [verbose: 0/1]\n", argvs[0]);
 		return 1;
 	}
 
-	int real_size, verbose;
+	int real_size, verbose, epsilon_power;
 	real_size = atoi(argvs[1]);
-	verbose = atoi(argvs[2]);
+	epsilon_power = atoi(argvs[2]);
+	verbose = atoi(argvs[3]);
 
 	// Init of parameters
 	struct timeval t0, t1, t2;
-	double epsilon = 1./100000000;
+	double epsilon = 1.;
+	for (int i=0; i < epsilon_power; i++) epsilon = epsilon / 10.;
 	double epsilon2 = epsilon * epsilon;
 	double norm2 = epsilon2 + 1.; // to be > epsilon2
 	int idx1, idx2, diag_idx, n_iter = 0;
