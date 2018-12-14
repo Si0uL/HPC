@@ -83,7 +83,7 @@ int main (int argc, char *argv[]) {
 	printf("-----------Size---------------\n");
 
 	// Loop on N & threads, Epsilon=10^-8
-	for (int nidx; nidx < l_sizes; nidx++) {
+	for (int nidx=0; nidx < l_sizes; nidx++) {
 		double *A = malloc(sizes[nidx] * sizes[nidx] * sizeof(double));
 		double *b = malloc(sizes[nidx] * sizeof(double));
 		double *x = malloc(sizes[nidx] * sizeof(double));
@@ -99,7 +99,7 @@ int main (int argc, char *argv[]) {
 		}
 
 		// Tests
-		for (int tidx=0; tidx < l_sizes; tidx ++)
+		for (int tidx=0; tidx < l_n_threads; tidx ++)
 			run_test(sizes[nidx], METHOD, n_threads[tidx], fixed_epsilon, A, b, x);
 
 		free(A);
