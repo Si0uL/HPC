@@ -13,14 +13,24 @@ for n, l in enumerate(lines):
 epsilons = [5, 6, 7, 8, 9, 10, 11]
 threads = [1, 2, 4, 8, 16, 32, 64]
 
+labels = ["{} Threads".format(th) for th in threads] + ["Gauss-Seidel"]
+
 Times_epsilon = [
 	[line[-1] for line in lines if line[2] == thread]
 	for thread in threads
 ]
 
+with open('epsilon_g.txt', 'r') as _file:
+	lines = _file.readlines()
+
+for n, l in enumerate(lines):
+	lines[n] = list(map(float, l.strip().split(',')))
+
+Times_epsilon.append([line[-1] for line in lines])
+
 plt.figure()
 for idx, curve in enumerate(Times_epsilon):
-	plt.plot(epsilons, curve, "-o", label="{} Threads".format(threads[idx]))
+	plt.plot(epsilons, curve, "-o", label=labels[idx])
 
 plt.legend()
 plt.xlabel("-log(epsilon)")
@@ -34,7 +44,7 @@ Acceleration_epsilon = [
 
 plt.figure()
 for idx, curve in enumerate(Acceleration_epsilon):
-	plt.plot(epsilons, curve, "-o", label="{} Threads".format(threads[idx]))
+	plt.plot(epsilons, curve, "-o", label=labels[idx])
 
 plt.legend()
 plt.xlabel("-log(epsilon)")
@@ -50,17 +60,24 @@ for n, l in enumerate(lines):
 	lines[n] = list(map(float, l.strip().split(',')))
 
 sizes = [256, 512, 1024, 2048, 4096, 8192]
-threads = [1, 2, 4, 8, 16, 32]
+threads = [1, 2, 4, 8, 16, 32, 64]
 
 Times_sizes = [
 	[line[-1] for line in lines if line[2] == thread]
 	for thread in threads
 ]
 
+with open('size_g.txt', 'r') as _file:
+	lines = _file.readlines()
+
+for n, l in enumerate(lines):
+	lines[n] = list(map(float, l.strip().split(',')))
+
+Times_sizes.append([line[-1] for line in lines])
+
 plt.figure()
 for idx, curve in enumerate(Times_sizes):
-	plt.plot(sizes, curve, "-o", label="{} Threads".format(
-		threads[idx]))
+	plt.plot(sizes, curve, "-o", label=labels[idx])
 
 plt.legend()
 plt.xlabel("Size of matrix")
@@ -74,7 +91,7 @@ Acceleration_size = [
 
 plt.figure()
 for idx, curve in enumerate(Acceleration_size):
-	plt.plot(sizes, curve, "-o", label="{} Threads".format(threads[idx]))
+	plt.plot(sizes, curve, "-o", label=labels[idx])
 
 plt.legend()
 plt.xlabel("Size of matrix")
