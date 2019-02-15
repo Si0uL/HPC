@@ -39,22 +39,33 @@ int main (int argc, char *argv[]) {
 	}
 	// EO init
 
-	double exec_time = omp_get_wtime();
+	double exec_time, start;
 
-	int niter;
+	int niter, n_sim = 10;
 
-	if (method == 1) {
-		niter = jacobi(A, b, x, N, epsilon2);
-	} else if (method == 2) {
-		niter = jacobi_parallel(A, b, x, N, epsilon2);
-	} else if (method == 3) {
-		niter = gauss_seidel(A, b, x, N, epsilon2);
-	} else {
-		printf("Usage: %s [size] [method(1/2/3)] [n_threads]\n", argv[0]);
-		return 2;
+	// Do n_sim computations instead of 1 to get an average exec. time
+	for (int idx=0; idx < n_sim; idx++) {
+
+		// Re-init X
+		for (int i = 0; i < N; i++)
+			x[i] = 1.;
+
+		start = omp_get_wtime();
+		if (method == 1) {
+			niter = jacobi(A, b, x, N, epsilon2);
+		} else if (method == 2) {
+			niter = jacobi_parallel(A, b, x, N, epsilon2);
+		} else if (method == 3) {
+			niter = gauss_seidel(A, b, x, N, epsilon2);
+		} else {
+			printf("Usage: %s [size] [method(1/2/3)] [n_threads]\n", argv[0]);
+			return 2;
+		}
+		exec_time += omp_get_wtime() - start;
+
 	}
 
-	exec_time = omp_get_wtime() - exec_time;
+	exec_time = exec_time / n_sim;
 
 	printf("Method %d\n", method);
 	printf("N = %d\nEpsilon^2 = %20.19f\n", N, epsilon2);
